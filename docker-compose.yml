@@ -92,14 +92,17 @@ services:
     volumes:
       - ./certbot/www:/var/www/certbot
       - ./certbot/conf:/etc/letsencrypt
-    entrypoint: /bin/sh -c
+    environment:
+      - EMAIL=${EMAIL:-aasiyaee@gmail.com}
+      - DOMAIN=${DOMAIN:-chatbot-test.asdir.xyz}
+    entrypoint: "/bin/sh"
     command: >
-      "trap exit TERM; while :; do
-         certbot certonly --webroot -w /var/www/certbot \
-           --agree-tos --no-eff-email \
-           -m ${EMAIL:-aasiyaee@gmail.com} \
-           -d ${DOMAIN:-chatbot-test.asdir.xyz} \
-           --keep-until-expiring && sleep 12h & wait $!; done"
+      -c 'trap exit TERM; while :; do
+           certbot certonly --webroot -w /var/www/certbot \
+             --agree-tos --no-eff-email \
+             -m $EMAIL \
+             -d $DOMAIN \
+             --keep-until-expiring && sleep 12h & wait $!; done'
 
 networks:
   internal:
